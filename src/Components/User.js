@@ -1,45 +1,22 @@
 import { Button, TextField } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import * as UserService from "../Service/UserService";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
+import { UserContext } from "./UserWrapper";
 
 export default function User() {
   const { id } = useParams();
-
-  const history = useHistory();
-  const initialValues = {
-    id: "",
-    name: "",
-    email: "",
-    mobileNo: "",
-    role: "",
-    websiteUrl: "",
-  };
-  const [values, setValues] = useState(initialValues);
+  const userContext = useContext(UserContext);
+  const { values, setValues, handleSubmit, handleCancel } = userContext;
 
   useEffect(() => {
-    UserService.getUserById(id).then((resp) => setValues(resp));
+    if (id) {
+      UserService.getUserById(id).then((resp) => setValues(resp));
+    }
   }, [id]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (id) {
-      UserService.updateUser(values).then((resp) => {
-        history.push("/");
-      });
-    } else {
-      UserService.saveUser(values).then((resp) => {
-        history.push("/");
-      });
-    }
-  };
-
-  const handleCancel = () => {
-    history.push("/");
-  };
-
   return (
-    <form className="user-section" onSubmit={(e) => handleSubmit(e)}>
+    <form className="user-section" onSubmit={(e) => handleSubmit(e, id)}>
       <div className="user-form">
         <TextField
           type="text"
